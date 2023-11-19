@@ -1,8 +1,7 @@
 import random
-from pygame import *
 import pyautogui
+from pygame import *
 from sys import exit
-
 
 
 class Angel(sprite.Sprite):
@@ -16,6 +15,8 @@ class Angel(sprite.Sprite):
 
         #设置天使生命值
         self.lives = 12
+
+
 
     def update(self):
         #处理键盘输入控制天使的移动
@@ -78,27 +79,11 @@ class Monster(sprite.Sprite):
             
             collision_sound.play()
             startLevel()
-            
 
 
 vxRanges = ((0, 0), (0, 0), (-1, 1), (1, 2), (0, 0), (-1, 1), (-1, 1), (-2, 2), (-2, 2), (-2, 2), (-2, 2), (-3, 3), (0, 0))
 vyRanges = ((1, 1), (1, 2), (1, 2), (1, 2), (1, 3), (1, 2), (1, 2), (1, 2), (1, 2), (1, 3), (1, 3), (1, 3), (0, 0))
 freqs = (0.1, 0.1, 0.1, 0.1, 0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.4, 0.4, 0)
-clock = time.Clock()
-angel = Angel()
-
-def write(s, x, y, center=0):
-    text = fnt.render(s, True, Color("white"))
-    screen.blit(text, (x - center * text.get_width() / 2, y))
-
-def introduce():
-    write("你好,小天使", width / 2, height / 2 - 90, 1)
-    write("现在你要返回天空", width / 2, height / 2 - 50, 1)
-    write("回家吧", width / 2, height / 2, 1)
-    write("记得躲避怪物哦",width / 2, height / 2 + 40, 1)
-    write("WASD移动",width / 2, height / 2 + 80, 1)
-    write("ESC返回",width / 2, height / 2 + 120, 1)
-
 
 def updateMonster():
     if random.random() < freqs[level - 1]:
@@ -149,18 +134,8 @@ def chooseDifficulty():
         for ev in event.get():
             if ev.type == QUIT:
                 exit(0)
-            elif ev.type == KEYDOWN:
-                if ev.key == K_1:
-                    selected_difficulty = "easy"
-                elif ev.key == K_2:
-                    selected_difficulty = "normal"
-                elif ev.key == K_3:
-                    selected_difficulty = "hard"
             elif ev.type == MOUSEBUTTONDOWN:
-                # 获取鼠标点击位置
                 mouse_x, mouse_y = ev.pos
-
-                # 调整鼠标点击的位置来选择难度
                 if 300 <= mouse_x <= 600 and 220 <= mouse_y <= 250:
                     selected_difficulty = "easy"
                 elif 300 <= mouse_x <= 600 and 260 <= mouse_y <= 290:
@@ -169,103 +144,141 @@ def chooseDifficulty():
                     selected_difficulty = "hard"
 
         screen.fill((0, 0, 0))
-        background_image = image.load("img\\background\\background_2.png")
-        background_image = transform.scale(background_image, (width, height))
-        screen.blit(background_image, (0, 0))
+        Start_background_1 = image.load("img\\background\\background_2.png")
+        Start_background_1 = transform.scale(Start_background_1, (width, height))
+        screen.blit(Start_background_1, (0, 0))
+
+        Start_background_2 = image.load("img\\background\\background_5.png")
+        Start_background_2 = transform.scale(Start_background_2, (300, 200))
+        background_rect = Start_background_2.get_rect()
+        background_rect.topright = (300, 0)
+        screen.blit(Start_background_2, background_rect)
+
+        Start_background_3 = image.load("img\\background\\background_6.png")
+        Start_background_3 = transform.scale(Start_background_3, (200, 300))
+        background_rect = Start_background_3.get_rect()
+        background_rect.topright = (850, 0)
+        screen.blit(Start_background_3, background_rect)
+        
 
         write("天使和怪物", width / 2, height / 2 - 230, 1)
         write("简单", width / 2, height / 2 - 50, 1)
         write("普通", width / 2, height / 2 , 1)
         write("困难", width / 2, height / 2 + 50, 1)
-        display.flip()
 
+        display.flip()
+    
     return selected_difficulty
 
+def write(s, x, y, center=0):
+    text = fnt.render(s, True, Color("white"))
+    screen.blit(text, (x - center * text.get_width() / 2, y))
 
-monster = sprite.RenderPlain()
-init()
-#音乐
-mixer.init()
-mixer.music.load('music\\background_music.mp3')
-mixer.music.play(-1)
-collision_sound = mixer.Sound('music\\collision_sound.mp3')
-failure_sound = mixer.Sound('music\\failure_sound.mp3')
-victory_sound = mixer.Sound('music\\victory_sound.mp3')
-#窗口
-width = 900
-height = 540
-window = display.set_mode((width,height))
-screen = display.get_surface()
-#背景
-background_images = [
+def introduce():
+    write("你好,小天使", width / 2, height / 2 - 90, 1)
+    write("现在你要返回天空", width / 2, height / 2 - 50, 1)
+    write("回家吧", width / 2, height / 2, 1)
+    write("记得躲避怪物哦",width / 2, height / 2 + 40, 1)
+    write("WASD移动",width / 2, height / 2 + 80, 1)
+    write("ESC返回",width / 2, height / 2 + 120, 1)
+
+
+def main():
+    #游戏初始化
+    init()
+    clock = time.Clock()
+    global angel,monster
+    angel = Angel()
+    monster = sprite.RenderPlain()
+
+    #音乐
+    mixer.init()
+    global failure_sound,victory_sound,collision_sound,shoot_sound
+    background_sound = mixer.Sound('music\\background_sound.mp3')   #背景音效
+    failure_sound    = mixer.Sound('music\\failure_sound.mp3')      #失败音效
+    victory_sound    = mixer.Sound('music\\victory_sound.mp3')      #胜利音效
+    collision_sound  = mixer.Sound('music\\collision_sound.mp3')    #碰撞音效
+    shoot_sound      = mixer.Sound('music\\shoot_sound.mp3')        #射击音效
+
+    #背景
+    background_images = [
     "img\\background\\background_1.png",
     "img\\background\\background_2.png",
     "img\\background\\background_3.png",
     "img\\background\\background_4.png",
-]
-#字体
-chinese_font = "font\\simfang.ttf"
-fnt = font.Font(chinese_font,20)
+    ]
 
-difficulty = chooseDifficulty()
-startLevel(1)
-while True:
-    for ev in event.get():
-        if ev.type == QUIT:
-            exit(0)
-        elif ev.type == KEYDOWN:
-            if ev.key == K_ESCAPE:  # 按下 ESC 键
-                difficulty = chooseDifficulty()
-                startLevel(1)
-    
-    screen.fill((0, 0, 0))
+    #字体
+    global fnt
+    chinese_font = "font\\simfang.ttf"
+    fnt = font.Font(chinese_font,20)
 
-    # 根据当前关卡选择背景图片
-    if level <= 3:
-        background_image = image.load(background_images[0])
-    elif (4<= level <=6 ):
-        background_image = image.load(background_images[1])
-    elif (7<= level <=9 ):
-        background_image = image.load(background_images[2])
-    else:
-        background_image = image.load(background_images[3])
+    #窗口
+    global width,height,window,screen
+    width = 900
+    height = 540
+    window = display.set_mode((width,height))
+    screen = display.get_surface()
 
-    background_image = transform.scale(background_image, (width, height))
-    screen.blit(background_image, (0, 0))
+    background_sound.play(-1)
+    global difficulty
+    difficulty = chooseDifficulty()
+    startLevel(1)
 
-    #显示天使的生命值
-    write("生命: %d" % angel.lives, width - 120, 20)
-    if level < len(vxRanges):
-        # 显示关卡信息，更新怪物，绘制怪物
-        write("关卡: %d/%d" % (level, len(vxRanges) - 1), width - 120, 40)
-        updateMonster()
-        monster.draw(screen)
-    else:
-        # 恭喜通关消息
-        victory_sound.play()
-        mixer.music.stop()
-        write("恭喜,欢迎回家!", width / 2, height / 2 - 10, 1)
-    if angel.lives > 0:
-        # 更新天使位置，绘制天使
-        angel.update()
-        screen.blit(angel.image, angel.rect.topleft)
-    else:
-        # 游戏结束消息和重新开始提示
-        mixer.music.stop()
-        failure_sound.play()
+    #进行
+    while True:
+        for ev in event.get():
+            if ev.type == QUIT:
+                exit(0)
+            elif ev.type == KEYDOWN:
+                if ev.key == K_ESCAPE:  
+                    difficulty = chooseDifficulty()
+                    startLevel(1)
+
+        screen.fill((0, 0, 0))
+        if level <= 3:
+            background_image = image.load(background_images[0])
+        elif (4<= level <=6 ):
+            background_image = image.load(background_images[1])
+        elif (7<= level <=9 ):
+            background_image = image.load(background_images[2])
+        else:
+            background_image = image.load(background_images[3])
+        background_image = transform.scale(background_image, (width, height))
+        screen.blit(background_image, (0, 0))
+
+        #显示天使的生命值
+        write("生命: %d" % angel.lives, width - 120, 20)
+        if level < len(vxRanges):
+            # 显示关卡信息，更新怪物，绘制怪物
+            write("关卡: %d/%d" % (level, len(vxRanges) - 1), width - 120, 40)
+            updateMonster()
+            monster.draw(screen)
+
+        else:
+            # 恭喜通关消息
+            victory_sound.play()
+            mixer.music.stop()
+            write("恭喜,欢迎回家!", width / 2, height / 2 - 10, 1)
+        if angel.lives > 0:
+            # 更新天使位置，绘制天使
+            angel.update()
+            screen.blit(angel.image, angel.rect.topleft)
+        else:
+            # 游戏结束消息和重新开始提示
+            mixer.music.stop()
+            failure_sound.play()
+            write("回家失败", width / 2, height / 2 - 40, 1)
+            write("请按 'n' 重新开始.", width / 2, height / 2 + 40, 1)
+        if key.get_pressed()[K_n]:
+            angel.lives = 12
+            startLevel(1)
+        if level == 1 and angel.lives == 12 and angel.rect.bottom == height:
+            introduce()
+
         
-        write("回家失败", width / 2, height / 2 - 40, 1)
-        write("请按 'n' 重新开始.", width / 2, height / 2 + 40, 1)
-    if key.get_pressed()[K_n]:
-        mixer.music.play(-1)
-        angel.lives = 12
-        startLevel(1)
+        display.flip()
+        clock.tick(40)
 
-    if level == 1 and angel.lives == 12 and angel.rect.bottom == height:
-        introduce()
 
-    display.flip()
-
-    clock.tick(40)
-
-    
+main()
